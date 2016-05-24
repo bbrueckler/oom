@@ -19,6 +19,7 @@ namespace Task4
         void SetMileage(int new_mileage);
     }
 
+    [JsonObject(MemberSerialization.Fields)]
     public class Sportbike : Bike
     {
         private int m_mileage;
@@ -26,14 +27,15 @@ namespace Task4
         public string Model { get; }
         public int ServiceInterval { get; set; }
 
-        public Sportbike(string manuf, string model, int mileage)
+        public Sportbike(string Manufacturer, string Model, int mileage, int ServiceInterval)
         {
-            if (string.IsNullOrWhiteSpace(manuf)) throw new ArgumentException("Manufacturer must not be empty.", nameof(manuf));
-            if (string.IsNullOrWhiteSpace(model)) throw new ArgumentException("Model must not be empty.", nameof(model));
+            if (string.IsNullOrWhiteSpace(Manufacturer)) throw new ArgumentException("Manufacturer must not be empty.", nameof(Manufacturer));
+            if (string.IsNullOrWhiteSpace(Model)) throw new ArgumentException("Model must not be empty.", nameof(Model));
             if (mileage < 0) throw new ArgumentOutOfRangeException("Mileage must not be negative. ", nameof(mileage));
 
-            Manufacturer = manuf;
-            Model = model;
+            this.Manufacturer = Manufacturer;
+            this.Model = Model;
+            this.ServiceInterval = ServiceInterval;
             m_mileage = mileage;
         }
 
@@ -54,6 +56,7 @@ namespace Task4
         }
     }
 
+    [JsonObject(MemberSerialization.Fields)]
     public class Dirtbike : Bike
     {
         private int m_mileage;
@@ -62,15 +65,16 @@ namespace Task4
         public int ServiceInterval { get; set; }
         public int ServiceInterval_Oil { get; set; }
 
-        public Dirtbike(string manuf, string model, int mileage)
+        public Dirtbike(string Manufacturer, string Model, int mileage, int ServiceInterval)
         {
-            if (string.IsNullOrWhiteSpace(manuf)) throw new ArgumentException("Manufacturer must not be empty.", nameof(manuf));
-            if (string.IsNullOrWhiteSpace(model)) throw new ArgumentException("Model must not be empty.", nameof(model));
+            if (string.IsNullOrWhiteSpace(Manufacturer)) throw new ArgumentException("Manufacturer must not be empty.", nameof(Manufacturer));
+            if (string.IsNullOrWhiteSpace(Model)) throw new ArgumentException("Model must not be empty.", nameof(Model));
             if (mileage < 0) throw new ArgumentOutOfRangeException("Mileage must not be negative. ", nameof(mileage));
 
-            Manufacturer = manuf;
-            Model = model;
+            this.Manufacturer = Manufacturer;
+            this.Model = Model;
             m_mileage = mileage;
+            this.ServiceInterval = ServiceInterval;
         }
 
         public int GetNextService()
@@ -100,14 +104,19 @@ namespace Task4
         static void Main(string[] args)
         {
             var bikes = new Bike[] {
-                new Sportbike ("Yamaha", "MT-07", 13000),
-                new Dirtbike ("Yamaha", "WR250", 4500)
+                new Sportbike ("Yamaha", "MT-07", 13000, 0),
+                new Dirtbike ("Yamaha", "WR250", 4500, 0)
             };
 
             bikes[0].ServiceInterval = 10000;
             bikes[1].ServiceInterval = 5000;
 
-            var settings = new JsonSerializerSettings() { Formatting = Formatting.Indented, TypeNameHandling = TypeNameHandling.Auto };
+            //var settings = new JsonSerializerSettings() { Formatting = Formatting.Indented, TypeNameHandling = TypeNameHandling.Auto };
+            var settings = new JsonSerializerSettings()
+            {
+                Formatting = Formatting.Indented,
+                TypeNameHandling = TypeNameHandling.Auto
+            };
             var desktop = Environment.GetFolderPath(Environment.SpecialFolder.Desktop);
             var filename = Path.Combine(desktop, "bikes.json");
             var json_strings = JsonConvert.SerializeObject(bikes, settings);
