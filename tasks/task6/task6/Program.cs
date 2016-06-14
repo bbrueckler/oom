@@ -12,6 +12,8 @@ namespace task6
 {
     class Program
     {
+
+        static int counter;
         static Random rand = new Random();
 
         class GetRandom
@@ -46,12 +48,18 @@ namespace task6
                 var b = new Sportbike(GetRandom.GetManuf(), GetRandom.GetModel() + " " + (rand.Next(7,13)*100 - 10) , rand.Next(1, 99999), rand.Next(5, 20)*1000);
                 yield return b;
             }
-        }       
+        }
 
         static void Main(string[] args)
         {
             var newbikes = new Subject<Sportbike>();
             newbikes.Subscribe(o => Console.WriteLine("Observer received: " + PrintBike(o)));
+
+            newbikes.
+                Where(b => b.GetMileage() > 50000).
+                Subscribe(b => Console.WriteLine("Observer: This is an old bike, Mileage: " + b.GetMileage() + " > 50000 km"));
+
+
 
             var t = new Thread(() =>
             {
@@ -63,14 +71,12 @@ namespace task6
 
                     Console.WriteLine("Pushing to observer...");
                     newbikes.OnNext(b.Current);
-                    Console.WriteLine("------------- Sleeping 5 seconds -------------");
-                    Thread.Sleep(5000);
+                    Console.WriteLine("------------- Sleeping 2 seconds -------------");
+                    Thread.Sleep(2000);
                 }
             });
 
             t.Start();
-            
-
         }
     }
 }
